@@ -1,7 +1,7 @@
 package com.amdg.fhtml.functions
 
 import com.amdg.fhtml.core.LibSpec
-import com.amdg.fhtml.core.generators.StringGenerators._
+import com.amdg.fhtml.tags.{RawTag, TagName}
 import org.scalatest.prop.PropertyChecks
 
 class ExtractorsSpec extends LibSpec with PropertyChecks {
@@ -9,21 +9,48 @@ class ExtractorsSpec extends LibSpec with PropertyChecks {
   import Extractors._
   import Predicates._
 
-  "trimFrom xxx allLeadingAndTrailingWhitespaces" should {
+  "extractFrom xxx tagName" should {
 
-    "return Right the given snippet if there are no leading or trailing whitespaces" in {
-      trimFrom("<abc></abc>", allLeadingAndTrailingWhitespaces) shouldBe Right("<abc></abc>")
-    }
-
-    "return Right the given snippet without leading or trailing whitespaces" in {
-
-      forAll(whitespacesStrings) { whitespaces =>
-
-        val snippet = s"$whitespaces<abc></abc>$whitespaces"
-
-        trimFrom(snippet, allLeadingAndTrailingWhitespaces) shouldBe Right("<abc></abc>")
+    "return Right with tag name extracted from the given snippet " +
+      "when there tag ends straight after tag name" in {
+      RawTag.from("<abc></abc>") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Right(TagName("abc"))
       }
     }
 
+    "return Right with tag name extracted from the given snippet " +
+      "when there are tag attributes" in {
+      RawTag.from("<abc attr></abc>") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Right(TagName("abc"))
+      }
+    }
+
+    "return Right with tag name extracted from the given snippet " +
+      "when tag is self-closing" in {
+      RawTag.from("<abc/>") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Right(TagName("abc"))
+      }
+    }
+
+    "return Left with ExtractionError " +
+      "when there is no tag name" in {
+      RawTag.from("<>") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Left(ExtractionError("No tag name found"))
+      }
+    }
+
+    "return Left with ExtractionError " +
+      "when there are whitespaces after '<'" in {
+      RawTag.from("< abc/>") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Left(ExtractionError("No tag name found"))
+      }
+    }
+
+    "return Left with ExtractionError " +
+      "when there is no tag name but just attributes" in {
+      RawTag.from("<abc=value />") map { snippet =>
+        extractFrom(snippet, tagName) shouldBe Left(ExtractionError("No tag name found"))
+      }
+    }
   }
 }

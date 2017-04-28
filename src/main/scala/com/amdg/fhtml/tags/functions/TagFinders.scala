@@ -1,9 +1,9 @@
 package com.amdg.fhtml.tags.functions
 
 import cats.data.Reader
-import cats.syntax.either._
-import com.amdg.fhtml.tags.{GenericTag, Tag}
+import cats.implicits._
 import com.amdg.fhtml.functions
+import com.amdg.fhtml.tags.{GenericTag, Tag}
 
 object TagFinders extends TagFinders {
 
@@ -11,17 +11,17 @@ object TagFinders extends TagFinders {
 
   object Implicits {
 
-    import functions.Extractors._
     import functions.Extractors.Predicates._
-    import functions.Verifiers._
-    import functions.Verifiers.Conditions._
+    import functions.Extractors._
 
-    implicit val genericTagFinder: TagFinder[GenericTag] = Reader { html =>
-      (for {
-        maybeTag <- trimFrom(html, allLeadingAndTrailingWhitespaces)
-        _ <- verifyThat(maybeTag, startsWith("<"))
-        _ <- verifyThat(maybeTag, endsWith(">"))
-      } yield GenericTag(maybeTag)).leftMap(error => GenericTagError(s"Given snippet is not valid html: $error", html))
+    implicit val genericTagFinder: TagFinder[GenericTag] = Reader { snippet =>
+
+      val maybeTag = for {
+        rawTag <- extractFrom(snippet, rawTag)
+        tagName <- extractFrom(rawTag, tagName)
+      } yield GenericTag(rawTag, tagName)
+
+      maybeTag leftMap (error => GenericTagError(s"Given snippet is not valid html: $error", snippet))
     }
   }
 

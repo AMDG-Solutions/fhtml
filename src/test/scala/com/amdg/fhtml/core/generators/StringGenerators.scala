@@ -4,6 +4,6 @@ import org.scalacheck.Gen
 
 object StringGenerators {
 
-  val whitespacesStrings = Gen.nonEmptyListOf(Gen.const(' ')).map(_.mkString)
+  val whitespacesStrings = Gen.listOf(Gen.const(' ')).map(_.mkString)
 
 }

@@ -1,3 +1,3 @@
 package com.amdg.fhtml.tags
 
-case class GenericTag(raw: String) extends Tag
+case class GenericTag(raw: RawTag, tagName: TagName) extends Tag
