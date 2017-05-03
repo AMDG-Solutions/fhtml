@@ -7,6 +7,6 @@ object Fhtml extends TagFinders {
 
   import TagFinders.Implicits._
 
-  def apply(html: String): TagError Either GenericTag = findTag(html)
+  def apply(html: String): TagError Either GenericTag = find[GenericTag](html)
 
 }

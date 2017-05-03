@@ -31,7 +31,7 @@ trait TagFinders {
 
   import TagFinders._
 
-  def findTag(html: String)
-             (implicit tagFinder: TagFinder[GenericTag]): TagError Either GenericTag = tagFinder.run(html)
+  def find[T <: Tag](html: String)
+                    (implicit tagFinder: TagFinder[T]): TagError Either T = tagFinder run html
 
 }
