@@ -4,10 +4,11 @@ import cats.data.Reader
 import cats.implicits._
 import com.amdg.fhtml.functions
 import com.amdg.fhtml.tags.{GenericTag, Tag}
+import com.amdg.fhtml.types.Snippet
 
-object TagFinders extends TagFinders {
+object SnippetOps {
 
-  private[tags] type TagFinder[T <: Tag] = Reader[String, TagError Either T]
+  private[tags] type TagFinder[T <: Tag] = Reader[Snippet, TagError Either T]
 
   object Implicits {
 
@@ -27,11 +28,12 @@ object TagFinders extends TagFinders {
 
 }
 
-trait TagFinders {
+trait SnippetOps {
 
-  import TagFinders._
+  self: Snippet =>
 
-  def find[T <: Tag](html: String)
-                    (implicit tagFinder: TagFinder[T]): TagError Either T = tagFinder run html
+  import SnippetOps._
+
+  def as[T <: Tag](implicit tagFinder: TagFinder[T]): TagError Either T = tagFinder run self
 
 }

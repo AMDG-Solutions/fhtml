@@ -1,14 +1,15 @@
 package com.amdg.fhtml.functions
 
 import cats.data.Reader
+import com.amdg.fhtml.types.Snippet
 
 object Verifiers {
 
-  import StringOps._
+  import SnippetInternalOps._
 
-  type Condition = Reader[String, ExtractionError Either String]
+  type Condition = Reader[Snippet, ExtractionError Either Snippet]
 
-  def verifyThat(snippet: String, condition: Condition): ExtractionError Either String = condition run snippet
+  def verifyThat(snippet: Snippet, condition: Condition): ExtractionError Either Snippet = condition run snippet
 
   object Conditions {
 
@@ -45,10 +46,6 @@ object Verifiers {
           left = ExtractionError(s"Empty content between '$start' and '$end'")
         )
       } yield snippet
-    }
-
-    def hasNoWhitespaceAt(idx: Int): Condition = Reader { snippet =>
-      snippet.noWhitespaceAt(idx = 1)
     }
 
     def hasNo(expression: String,
