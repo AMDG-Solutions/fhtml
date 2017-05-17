@@ -1,10 +1,13 @@
 package com.amdg.fhtml.core.matchers
 
+import com.amdg.fhtml.FhtmlError
 import com.amdg.fhtml.functions.ExtractionError
 import com.amdg.fhtml.tags.Tag
 import com.amdg.fhtml.tags.functions.TagError
 import com.amdg.fhtml.types.Snippet
-import org.scalatest.matchers.{HavePropertyMatchResult, HavePropertyMatcher}
+import org.scalatest.matchers._
+
+import scala.reflect.ClassTag
 
 object EitherMatchers {
 
@@ -46,4 +49,15 @@ object EitherMatchers {
       )
     )
   }
+
+  def errorOfType[E <: FhtmlError](implicit classTag: ClassTag[E]): BeMatcher[E Either _] =
+    (either: E Either _) => MatchResult(
+      either match {
+        case Left(error) if error.getClass == classTag.runtimeClass => true
+        case _ => false
+      },
+      s"was $either and not Left[${classTag.runtimeClass.getSimpleName}]",
+      s"was Left[${classTag.runtimeClass.getSimpleName}]"
+    )
+
 }

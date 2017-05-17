@@ -18,7 +18,7 @@ object SnippetOps {
     implicit val genericTagFinder: TagFinder[GenericTag] = Reader { snippet =>
 
       val maybeTag = for {
-        rawTag <- extractFrom(snippet, rawTag)
+        rawTag <- extractFrom(snippet, next)
         tagName <- extractFrom(rawTag, tagName)
       } yield GenericTag(rawTag, tagName)
 

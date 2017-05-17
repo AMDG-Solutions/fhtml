@@ -16,11 +16,17 @@ object Extractors {
 
   object Predicates {
 
-    val rawTag: Reader[Snippet, ExtractionError Either RawTag] = Reader { snippet =>
+    def next[T](implicit tokenFinder: Reader[Snippet, ExtractionError Either T]): Reader[Snippet, ExtractionError Either T] = Reader { snippet =>
       for {
         nonWhitespace <- snippet.trimLeadingWhitespaces
-        _ <- verifyThat(nonWhitespace, startsWith("<")) leftMap (error => ExtractionError(s"no tag found: $error"))
-        tag <- nonWhitespace.cut(from = "<", to = ">") leftMap (_ => ExtractionError(s"no tag found: '${nonWhitespace.value}'; ${nonWhitespace.startIdx}; ${nonWhitespace.endIdx}"))
+        tag <- tokenFinder.run(nonWhitespace)
+      } yield tag
+    }
+
+    implicit val rawTagFinder: Reader[Snippet, ExtractionError Either RawTag] = Reader { snippet =>
+      for {
+        _ <- verifyThat(snippet, startsWith("<")) leftMap (error => ExtractionError(s"no tag found: $error"))
+        tag <- snippet.cut(from = "<", to = ">") leftMap (_ => ExtractionError(s"no tag found: '${snippet.value}'; ${snippet.startIdx}; ${snippet.endIdx}"))
         tagContent <- tag.cutBetween("<", ">") flatMap (_.trimLeadingWhitespaces)
         _ <- verifyThat(tagContent, nonEmpty) leftMap (_ => ExtractionError("empty tag"))
       } yield RawTag(tag)
