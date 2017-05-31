@@ -51,7 +51,7 @@ private[functions] object SnippetInternalOps {
       snippet.value.startsWith(expression, snippet.startIdx)
 
     def endsWith(expression: String): Boolean =
-      snippet.value.lastIndexOf(expression, snippet.endIdx) != -1
+      snippet.value.indexOf(expression, snippet.startIdx) == snippet.endIdx
 
     lazy val nonEmpty: Boolean =
       snippet.startIdx != snippet.endIdx

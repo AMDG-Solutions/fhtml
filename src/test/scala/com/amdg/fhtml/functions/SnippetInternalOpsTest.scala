@@ -130,7 +130,7 @@ class SnippetInternalOpsTest extends LibSpec with PropertyChecks {
       Snippet("abc").moveWindow(1, 2).endsWith("c") shouldBe true
     }
 
-    "return false if the snippet's startIdx does not point to the given expression" in {
+    "return false if the snippet's endIdx does not point to the given expression" in {
       Snippet("abc").endsWith("bc") shouldBe false
     }
   }

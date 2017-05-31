@@ -16,6 +16,16 @@ case class Snippet private(value: String, startIdx: Int, endIdx: Int)
     endIdx = newIdx max endIdx
   )
 
+  def moveStartIdxBy(v: Int): Snippet = copy(
+    startIdx = startIdx + v,
+    endIdx = startIdx + v max endIdx
+  )
+
+  def moveEndIdxBy(v: Int): Snippet = copy(
+    startIdx = startIdx min endIdx + v,
+    endIdx = endIdx + v
+  )
+
   def moveWindow(startIdx: Int, endIdx: Int): Snippet = copy(
     startIdx = startIdx,
     endIdx = endIdx

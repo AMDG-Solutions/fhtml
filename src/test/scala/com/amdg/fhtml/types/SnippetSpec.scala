@@ -16,7 +16,7 @@ class SnippetSpec extends LibSpec {
 
   "moveStartIdx" should {
 
-    "move snippet's startIdx with the given index" in {
+    "move snippet's startIdx to the given index" in {
       Snippet("abc").moveWindow(0, 2).moveStartIdx(1) should have(
         'startIdx (1),
         'endIdx (2)
@@ -51,6 +51,100 @@ class SnippetSpec extends LibSpec {
 
     "throw an exception if the given new startIdx is greater than max index" in {
       an[IllegalArgumentException] should be thrownBy Snippet("abc").moveStartIdx(3)
+    }
+  }
+
+  "moveStartIdxBy" should {
+
+    "move snippet's startIdx by the given positive value" in {
+      Snippet("abc").moveWindow(0, 2).moveStartIdxBy(1) should have(
+        'startIdx (1),
+        'endIdx (2)
+      )
+    }
+
+    "move snippet's startIdx by the given negative value" in {
+      Snippet("abc").moveWindow(1, 2).moveStartIdxBy(-1) should have(
+        'startIdx (0),
+        'endIdx (2)
+      )
+    }
+
+    "move snippet's startIdx and endIdx when both pointing to the same index" in {
+      Snippet("abc").moveStartIdxBy(2) should have(
+        'startIdx (2),
+        'endIdx (2)
+      )
+    }
+
+    "move snippet's startIdx and endIdx when endIdx before the new startIdx" in {
+
+      val snippet = Snippet("abc").moveWindow(0, 1)
+
+      snippet should have(
+        'startIdx (0),
+        'endIdx (1)
+      )
+
+      snippet.moveStartIdxBy(2) should have(
+        'startIdx (2),
+        'endIdx (2)
+      )
+    }
+
+    "throw an exception if the given new startIdx is less min index" in {
+      an[IllegalArgumentException] should be thrownBy Snippet("abc").moveStartIdxBy(-1)
+    }
+
+    "throw an exception if the given new startIdx is greater than max index" in {
+      an[IllegalArgumentException] should be thrownBy Snippet("abc").moveStartIdxBy(3)
+    }
+  }
+
+  "moveEndIdxBy" should {
+
+    "move snippet's endIdx by the given positive value" in {
+      Snippet("abc").moveWindow(0, 1).moveEndIdxBy(1) should have(
+        'startIdx (0),
+        'endIdx (2)
+      )
+    }
+
+    "move snippet's endIdx by the given negative value" in {
+      Snippet("abc").moveWindow(1, 2).moveEndIdxBy(-1) should have(
+        'startIdx (1),
+        'endIdx (1)
+      )
+    }
+
+    "move snippet's startIdx and endIdx when both pointing to the same index" in {
+      Snippet("abc").moveWindow(1, 1).moveEndIdxBy(-1) should have(
+        'startIdx (0),
+        'endIdx (0)
+      )
+    }
+
+    "move snippet's startIdx and endIdx when startIdx after the new endIdx" in {
+
+      val snippet = Snippet("abc").moveWindow(1, 2)
+
+      snippet should have(
+        'startIdx (1),
+        'endIdx (2)
+      )
+
+      snippet.moveEndIdxBy(-2) should have(
+        'startIdx (0),
+        'endIdx (0)
+      )
+    }
+
+    "throw an exception if the given new endIdx is less min index" in {
+      an[IllegalArgumentException] should be thrownBy Snippet("abc").moveEndIdxBy(-1)
+    }
+
+    "throw an exception if the given new endIdx is greater than max index" in {
+      an[IllegalArgumentException] should be thrownBy Snippet("abc").moveEndIdxBy(3)
     }
   }
 

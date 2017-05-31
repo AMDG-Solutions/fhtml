@@ -5,15 +5,25 @@ import com.amdg.fhtml.functions.Verifiers.Conditions.{endsWith, nonEmptyBetween,
 import com.amdg.fhtml.functions.Verifiers.verifyThat
 import com.amdg.fhtml.types.{NonEmpty, Snippet, StringValue}
 
-case class RawTag private(value: Snippet)
+case class TagSnippet private(value: Snippet)
 
-object RawTag {
+object TagSnippet {
 
-  def from(snippet: Snippet): ExtractionError Either RawTag = for {
+  def from(snippet: Snippet): ExtractionError Either TagSnippet = for {
     _ <- verifyThat(snippet, startsWith("<"))
     _ <- verifyThat(snippet, endsWith(">"))
     _ <- verifyThat(snippet, nonEmptyBetween("<", ">"))
-  } yield RawTag(snippet)
+  } yield TagSnippet(snippet)
 }
 
 case class TagName(value: String) extends StringValue with NonEmpty
+
+case class TagBodySnippet private(value: Snippet)
+
+object TagBodySnippet {
+
+  def from(snippet: Snippet): ExtractionError Either TagBodySnippet = for {
+    _ <- verifyThat(snippet.moveStartIdxBy(-1), startsWith(">"))
+    _ <- verifyThat(snippet, endsWith("<"))
+  } yield TagBodySnippet(snippet)
+}

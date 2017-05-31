@@ -1,7 +1,7 @@
 package com.amdg.fhtml.tags
 
 trait Tag {
-  val raw: RawTag
+  val raw: TagSnippet
   val tagName: TagName
 }
 

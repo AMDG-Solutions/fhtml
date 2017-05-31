@@ -2,7 +2,7 @@ package com.amdg.fhtml.functions
 
 import cats.data.Reader
 import cats.syntax.either._
-import com.amdg.fhtml.tags.{RawTag, TagName}
+import com.amdg.fhtml.tags.{TagSnippet, TagName}
 import com.amdg.fhtml.types.Snippet
 
 object Extractors {
@@ -23,16 +23,16 @@ object Extractors {
       } yield tag
     }
 
-    implicit val rawTagFinder: Reader[Snippet, ExtractionError Either RawTag] = Reader { snippet =>
+    implicit val rawTagFinder: Reader[Snippet, ExtractionError Either TagSnippet] = Reader { snippet =>
       for {
         _ <- verifyThat(snippet, startsWith("<")) leftMap (error => ExtractionError(s"no tag found: $error"))
         tag <- snippet.cut(from = "<", to = ">") leftMap (_ => ExtractionError(s"no tag found: '${snippet.value}'; ${snippet.startIdx}; ${snippet.endIdx}"))
         tagContent <- tag.cutBetween("<", ">") flatMap (_.trimLeadingWhitespaces)
         _ <- verifyThat(tagContent, nonEmpty) leftMap (_ => ExtractionError("empty tag"))
-      } yield RawTag(tag)
+      } yield TagSnippet(tag)
     }
 
-    val tagName: Reader[RawTag, ExtractionError Either TagName] = Reader { tag =>
+    val tagName: Reader[TagSnippet, ExtractionError Either TagName] = Reader { tag =>
 
       val maybeTagName = for {
         tagEndIdx <- tag.value.indexOfFirst(">")
